@@ -4,8 +4,7 @@ from django.urls import reverse
 from django import forms
 from django.template import Context, Template
 
-from cabot.plugins.models import StatusCheckPlugin
-from cabot.cabotapp.models import StatusCheckResult
+from cabot.cabotapp.models import StatusCheckResult, StatusCheck
 
 from os import environ as env
 import re
@@ -66,7 +65,9 @@ class HttpStatusCheckForm(forms.Form):
     )
 
 
-class HttpStatusCheckPlugin(StatusCheckPlugin):
+class HttpStatusCheck(StatusCheck):
+    
+    check_name = 'http'
     name = "HTTP Status"
     slug = "cabot_check_http"
     author = "Jonathan Balls"
@@ -79,34 +80,37 @@ class HttpStatusCheckPlugin(StatusCheckPlugin):
         'HTTP_USER_AGENT',
     ]
 
-    def run(self, check, result):
+    def _run(self):
+        result = StatusCheckResult(status_check=self)
 
         auth = None
-        if check.username or check.password:
-            auth = (check.username, check.password)
+        if self.username or self.password:
+            auth = (self.username if self.username is not None else '',
+                    self.password if self.password is not None else '')
 
-	try:
-	    resp = requests.get(
-		check.endpoint,
-		timeout=check.timeout,
-		verify=check.verify_ssl_certificate,
-		auth=auth,
-		headers={
-		    "User-Agent": settings.HTTP_USER_AGENT,
-		})
+        try:
+            resp = requests.get(
+                self.endpoint,
+                timeout=self.timeout,
+                verify=self.verify_ssl_certificate,
+                auth=auth,
+                headers={
+                    "User-Agent": settings.HTTP_USER_AGENT,
+                },
+            )
         except requests.RequestException as e:
             result.error = u'Request error occurred: %s' % (e.message,)
             result.succeeded = False
         else:
-            if check.status_code and resp.status_code != int(check.status_code):
+            if self.status_code and resp.status_code != int(self.status_code):
                 result.error = u'Wrong code: got %s (expected %s)' % (
-                    resp.status_code, int(check.status_code))
+                    resp.status_code, int(self.status_code))
                 result.succeeded = False
-                result.raw_data = resp.content
-            elif check.text_match:
-                if not re.search(check.text_match, resp.content):
-                    result.error = u'Failed to find match regex /%s/ in response body' % check.text_match
-                    result.raw_data = resp.content
+                result.raw_data = resp.text
+            elif self.text_match:
+                if not self._check_content_pattern(self.text_match, resp.text):
+                    result.error = u'Failed to find match regex /%s/ in response body' % self.text_match
+                    result.raw_data = resp.text
                     result.succeeded = False
                 else:
                     result.succeeded = True
@@ -114,6 +118,9 @@ class HttpStatusCheckPlugin(StatusCheckPlugin):
                 result.succeeded = True
         return result
 
+    def __str__(self):
+        return self.name
+        
     def description(self, check):
         if check.endpoint:
             return 'Status Code {} from {}'.format(check.status_code, check.endpoint)
