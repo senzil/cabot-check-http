@@ -4,7 +4,7 @@ from django.urls import reverse
 from django import forms
 from django.template import Context, Template
 
-from cabot.cabotapp.models import StatusCheckResult, StatusCheck
+from cabot3.cabotapp.models import StatusCheckResult, StatusCheck
 
 from os import environ as env
 import re

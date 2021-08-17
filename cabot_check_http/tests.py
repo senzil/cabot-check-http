@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.models import User
-from cabot.cabotapp.tests.tests_basic import LocalTestCase
-from cabot.cabotapp.models import StatusCheck, Instance
-from cabot.plugins.models import StatusCheckPluginModel
-from cabot_check_http.plugin import HttpStatusCheckPlugin
-from cabot.cabotapp.models import Service, StatusCheckResult
+from cabot3.cabotapp.tests.tests_basic import LocalTestCase
+from cabot3.cabotapp.models import StatusCheck, Instance
+from cabot3.plugins.models import StatusCheckPluginModel
+from cabot3_check_http.plugin import HttpStatusCheckPlugin
+from cabot3.cabotapp.models import Service, StatusCheckResult
 from mock import Mock, patch
 import os
 
