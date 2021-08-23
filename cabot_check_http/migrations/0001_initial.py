@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import django.db.models.deletion
 from django.db import migrations, models
-from cabot3 import settings
 
 class Migration(migrations.Migration):
 
@@ -13,35 +12,17 @@ class Migration(migrations.Migration):
     dependencies = [
         ('cabotapp', '0001_initial'),
     ]
+
+
     operations = [
             migrations.CreateModel(
             name='HttpStatusCheck',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
-                ('active', models.BooleanField(default=True, help_text='If not active, check will not be used to calculate service status and will not trigger alerts.')),
-                ('importance', models.CharField(choices=[('WARNING', 'Warning'), ('ERROR', 'Error'), ('CRITICAL', 'Critical')], default='ERROR', help_text='Severity level of a failure. Critical alerts are for failures you want to wake you up at 2am, Errors are things you can sleep through but need to fix in the morning, and warnings for less important things.', max_length=30)),
-                ('frequency', models.IntegerField(default=5, help_text='Minutes between each check.')),
-                ('debounce', models.IntegerField(default=0, help_text='Number of successive failures permitted before check will be marked as failed. Default is 0, i.e. fail on first failure.', null=True)),
-                ('calculated_status', models.CharField(blank=True, choices=[('passing', 'passing'), ('intermittent', 'intermittent'), ('failing', 'failing')], default='passing', max_length=50)),
-                ('last_run', models.DateTimeField(null=True)),
-                ('cached_health', models.TextField(editable=False, null=True)),
-                ('metric', models.TextField(help_text='fully.qualified.name of the Graphite metric you want to watch. This can be any valid Graphite expression, including wildcards, multiple hosts, etc.', null=True)),
-                ('check_type', models.CharField(choices=[('>', 'Greater than'), ('>=', 'Greater than or equal'), ('<', 'Less than'), ('<=', 'Less than or equal'), ('==', 'Equal to')], max_length=100, null=True)),
-                ('value', models.TextField(help_text='If this expression evaluates to true, the check will fail (possibly triggering an alert).', null=True)),
-                ('expected_num_hosts', models.IntegerField(default=0, help_text='The minimum number of data series (hosts) you expect to see.', null=True)),
-                ('allowed_num_failures', models.IntegerField(default=0, help_text='The maximum number of data series (metrics) you expect to fail. For example, you might be OK with 2 out of 3 webservers having OK load (1 failing), but not 1 out of 3 (2 failing).', null=True)),
-                ('endpoint', models.TextField(help_text='HTTP(S) endpoint to poll.', null=True, validators=[django.core.validators.URLValidator()])),
-                ('username', models.TextField(blank=True, help_text='Basic auth username.', null=True)),
-                ('password', models.TextField(blank=True, help_text='Basic auth password.', null=True)),
-                ('text_match', models.TextField(blank=True, help_text='Regex to match against source of page.', null=True)),
-                ('status_code', models.TextField(default=200, help_text='Status code expected from endpoint.', null=True)),
-                ('timeout', models.IntegerField(default=30, help_text='Time out after this many seconds.', null=True)),
-                ('verify_ssl_certificate', models.BooleanField(default=True, help_text='Set to false to allow not try to verify ssl certificates (default True)')),
-                ('max_queued_build_time', models.IntegerField(blank=True, help_text='Alert if build queued for more than this many minutes.', null=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_cabotapp.statuscheck_set+', to='contenttypes.contenttype')),
-            ],
+            fields=[                
+                ('statuscheck_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='cabotapp.StatusCheck')),],
+            options={
+                'abstract': False,
+            },
+            bases=('cabotapp.statuscheck',),
         ),
        
     ]
