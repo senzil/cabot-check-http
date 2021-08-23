@@ -13,8 +13,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('cabotapp', '0001_initial'),
     ]
-
-
     operations = [
             migrations.CreateModel(
             name='HttpStatusCheck',
@@ -44,11 +42,6 @@ class Migration(migrations.Migration):
                 ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_cabotapp.statuscheck_set+', to='contenttypes.contenttype')),
             ],
-            options={
-                'abstract': False,
-                'proxy': True,
-            },
-            bases=('cabotapp.statuscheck',),
         ),
        
     ]
