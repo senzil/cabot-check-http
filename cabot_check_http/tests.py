@@ -52,7 +52,7 @@ class TestHttpStatusCheckPlugin(LocalTestCase):
         self.http_check = StatusCheck.objects.get(pk=self.http_check.pk)
 	self.service.status_checks.add(self.http_check)
 
-    @patch('cabot.cabotapp.models.requests.get', fake_http_200_response)
+    @patch('cabot3.cabotapp.models.requests.get', fake_http_200_response)
     def test_run_success(self):
         http_results = self.http_check.statuscheckresult_set.all()
         self.assertEqual(len(http_results), 0)
@@ -62,7 +62,7 @@ class TestHttpStatusCheckPlugin(LocalTestCase):
         http_results = self.http_check.statuscheckresult_set.all()
         self.assertEqual(len(http_results), 1)
 
-    @patch('cabot.cabotapp.models.requests.get', fake_http_200_response)
+    @patch('cabot3.cabotapp.models.requests.get', fake_http_200_response)
     def test_test_matching(self):
 	
         # Text matching
@@ -88,7 +88,7 @@ class TestHttpStatusCheckPlugin(LocalTestCase):
         self.assertEqual(self.http_check.calculated_status,
                          Service.CALCULATED_FAILING_STATUS)
 
-    @patch('cabot.cabotapp.models.requests.get', fake_http_404_response)
+    @patch('cabot3.cabotapp.models.requests.get', fake_http_404_response)
     def test_http_run_bad_resp(self):
         http_results = self.http_check.statuscheckresult_set.all()
         self.assertEqual(len(http_results), 0)
